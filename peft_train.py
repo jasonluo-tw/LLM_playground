@@ -47,18 +47,19 @@ def check_str(x):
 
 device = "cuda"
 #model_name_or_path = "bigscience/T0_3B"
-model_name_or_path = "bigscience/mt0-large"
+#model_name_or_path = "bigscience/mt0-large"
+model_name_or_path = "bigscience/bloomz-1b7"
 #model_name_or_path = "bigscience/mt0-small"
 #model_name_or_path = "THUDM/chatglm-6b"
 
 lr = 1e-3
-num_epochs = 5
+num_epochs = 80
 batch_size = 2
 
 # creating model
 continue_train = False
-#peft_model_id = 'checkpoint/bigscience/mt0-small_LORA_202307030707'
-model, peft_config = create_model(continue_train, model_name_or_path)
+peft_model_id = 'checkpoint/bigscience/mt0-large_LORA_202307041930'
+model, peft_config = create_model(continue_train, model_name_or_path, peft_model_id, load_8bit_flag=True)
 
 ## read data
 with open('data/天龍八部.txt') as f:
@@ -167,55 +168,3 @@ for epoch in range(num_epochs):
     print('prediction:', eval_preds[0], flush=True)
 
 print('Training Done')
-
-#from peft import PeftModel, PeftConfig
-#
-#peft_model_id = f"/content/gdrive/MyDrive/chinese_dataset/bigscience/mt0-small_LORA_202307020324"
-#
-#config = PeftConfig.from_pretrained(peft_model_id)
-#model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)
-#model = PeftModel.from_pretrained(model, peft_model_id)
-#
-### original pre-trained model
-#model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path)
-#
-#del model
-#model
-#
-#model.eval()
-#
-#i = 9
-#input_text = processed_valid[i]['sentence']
-#label_ids = processed_valid[i]['labels'][0]
-#label_ids = np.array(label_ids)
-#label_ids[label_ids == -100] = 0
-##print(label_ids)
-#
-##input_text = '12星座分別有哪幾種?'
-#inputs = tokenizer(input_text, return_tensors="pt")
-#label_texts = tokenizer.decode(label_ids)
-##print(input_text)
-##print(processed_valid[i]['input_ids'])
-##print()
-##print(label_texts)
-#
-#orig_inputs = input_text
-#all_texts = ''
-#
-#for j in tqdm(range(10)):
-#  with torch.no_grad():
-#    outputs = model.generate(input_ids=inputs['input_ids'], max_new_tokens=120, temperature=0.8,
-#                               num_beams=1, repetition_penalty=1.3, do_sample=True)
-#
-#    output_text = tokenizer.batch_decode(outputs.detach().cpu().numpy(), skip_special_tokens=True)
-#
-#  all_texts += output_text[0] + '\n'
-#
-#  #print(all_texts)
-#  input_text = all_texts
-#  inputs = tokenizer(input_text, return_tensors="pt")
-#
-##print(orig_inputs)
-#print()
-#print('Input:', orig_inputs)
-#print(all_texts)

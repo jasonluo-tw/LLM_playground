@@ -31,3 +31,4 @@ openai api fine_tunes.create \
   --classification_positive_class <POSITIVE_CLASS_FROM_DATASET>
 
 openai api fine_tunes.follow -i ft-zcrJJXblwsGBOeldFV8BLBkP
+openai api fine_tunes.results -i ft-zcrJJXblwsGBOeldFV8BLBkP

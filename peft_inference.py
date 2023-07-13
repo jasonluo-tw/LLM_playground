@@ -30,17 +30,18 @@ def check_str(x):
   return {'sentence': x + '\n'}
 
 device = 'cuda'
-#peft_model_id = f"/content/gdrive/MyDrive/chinese_dataset/bigscience/mt0-small_LORA_202307020324"
+peft_model_id = f"checkpoint/bigscience/bloomz-1b7_LORA_202307070015"
 model_name_or_path = "bigscience/bloomz-1b7"
-#model_name_or_path = 'databricks/dolly-v2-3b'
 
-#config = PeftConfig.from_pretrained(peft_model_id)
+config = PeftConfig.from_pretrained(peft_model_id)
 #model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)
-#model = PeftModel.from_pretrained(model, peft_model_id)
+model = AutoModelForCausalLM.from_pretrained(config.base_model_name_or_path)
+model = PeftModel.from_pretrained(model, peft_model_id)
 
 ## original pre-trained model
 #model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path)
-model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
+#model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
+
 model.eval()
 model = model.to(device)
 
@@ -53,7 +54,7 @@ data = list(map(check_str, data))
 
 ## tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-dataset = SentenceDataset(data, tokenizer)
+dataset = SentenceDataset(data[:8000], tokenizer)
 
 train_size = int(len(dataset) * 0.8)
 valid_size = len(dataset) - train_size
@@ -61,28 +62,32 @@ valid_size = len(dataset) - train_size
 train_set, valid_set = random_split(dataset, [train_size, valid_size],
                                     generator=torch.Generator().manual_seed(42))
 
-
-i = 9
+i = 3
 inputs = valid_set[i]
 label_ids  = valid_set[i]['labels'][0]
 label_ids  = np.array(label_ids)
 label_ids[label_ids == -100] = 0
 #print(label_ids)
 
-input_text = tokenizer.decode(inputs['input_ids'][0], skip_special_tokens=True)
+
+input_text = tokenizer.decode(inputs['input_ids'], skip_special_tokens=True)
 label_texts = tokenizer.decode(label_ids)
 
 orig_inputs = input_text
 all_texts = ''
-
+###
+input_text = '阿紫指著那氣息已結的獵戶罵道:「你這自不量力的豬狗,居然想來暗算我姊夫」 耶律洪基見阿紫一叉擲死那個獵戶,心下甚喜,說道:「好姑娘,你身手矯捷,果然十分快手。我同你講個道理，要殺某人的，並非說什麼手腳利落的決不是自不量力。雖然這手腳有錯，卻也算不得是真刀真槍，倒似是人家倒扣刀柄，手指插破單刀，不由自主的便殺了個毫無防備的盲人。'
+inputs = tokenizer(input_text)
 
 print('input text:', input_text)
-for j in range(5):
+input_len = len(input_text)
+st = time.time()
+for j in range(1):
     with torch.no_grad():
         #outputs = model.generate(input_ids=inputs['input_ids'].to(device), max_new_tokens=1024, temperature=0.8,
         #                       num_beams=3, repetition_penalty=1.3, do_sample=True)
 
-        outputs = model.generate(input_ids=inputs['input_ids'].to(device), max_new_tokens=1024, do_sample=True)
+        outputs = model.generate(input_ids=torch.tensor([inputs['input_ids']], dtype=torch.int).to(device), max_new_tokens=100, do_sample=True)
         output_text = tokenizer.batch_decode(outputs.detach().cpu().numpy(), skip_special_tokens=True)
 
     
@@ -91,8 +96,9 @@ for j in range(5):
     #print('=========================')
     input_text = all_texts
     inputs = tokenizer(input_text+ '->', return_tensors="pt", max_length=1024, padding="max_length")
+et = time.time()
 
 print('======================')
-print(output_text[0])
+print(output_text[0][input_len:])
 #output = output_text[0].replace('->', '')
 #print(output)

@@ -21,10 +21,11 @@ from data_load import SentenceDataset
 from function import create_model
 
 def check_str(x):
-  x = re.findall('[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b\u4e00-\u9fa5\w]',x)
-  x = ''.join(x)
-  #x = x.replace('\u3000', '')
-  #x = x.replace('\xa0', '')
+    x = re.findall('[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b\u4e00-\u9fa5\w]',x)
+    x = ''.join(x)
+    #x = x.replace('\u3000', '')
+    #x = x.replace('\xa0', '')
+  
 
   return {'sentence': x + '\n'}
 
@@ -33,17 +34,17 @@ device = "cuda"
 model_name_or_path = "bigscience/bloomz-1b7" 
 
 lr = 1e-4
-num_epochs = 5
+num_epochs = 10
 batch_size = 4
 
 # creating model
 continue_train = False
-peft_model_id = 'checkpoint/bigscience/bloomz-1b7_LORA_202307070015'
+peft_model_id = 'checkpoint/bigscience/bloomz-1b7_LORA_20230814'
 model, peft_config = create_model(continue_train, model_name_or_path, peft_model_id)#, load_8bit_flag=True)
 
 ## read data
 with open('data/天龍八部.txt') as f:
-  data = f.readlines()[40:]
+  data = f.readlines()
 
 data = list(filter(lambda x: len(x.strip()) >= 30, data))
 data = list(map(check_str, data))

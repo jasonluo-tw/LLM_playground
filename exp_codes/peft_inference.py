@@ -36,7 +36,7 @@ model_name_or_path = "bigscience/bloomz-1b7"
 config = PeftConfig.from_pretrained(peft_model_id)
 #model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path)
 model = AutoModelForCausalLM.from_pretrained(config.base_model_name_or_path)
-model = PeftModel.from_pretrained(model, peft_model_id)
+#model = PeftModel.from_pretrained(model, peft_model_id)
 
 ## original pre-trained model
 #model = AutoModelForSeq2SeqLM.from_pretrained(model_name_or_path)
@@ -76,7 +76,8 @@ label_texts = tokenizer.decode(label_ids)
 orig_inputs = input_text
 all_texts = ''
 ###
-input_text = '阿紫指著那氣息已結的獵戶罵道:「你這自不量力的豬狗,居然想來暗算我姊夫」 耶律洪基見阿紫一叉擲死那個獵戶,心下甚喜,說道:「好姑娘,你身手矯捷,果然十分快手。我同你講個道理，要殺某人的，並非說什麼手腳利落的決不是自不量力。雖然這手腳有錯，卻也算不得是真刀真槍，倒似是人家倒扣刀柄，手指插破單刀，不由自主的便殺了個毫無防備的盲人。'
+input_text = '阿紫指著那氣息已結的獵戶罵道:「你這自不量力的豬狗,居然想來暗算我姊夫」 耶律洪基見阿紫一叉擲死那個獵戶,心下甚喜,說道:「好姑娘,你身手矯捷,果然十分快手。我同你講'
+#input_text = '你的星座是什麼?'
 inputs = tokenizer(input_text)
 
 print('input text:', input_text)
